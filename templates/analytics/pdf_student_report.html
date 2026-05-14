@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student Report — {{ student.usn }}</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 11pt;
+    color: #111;
+    background: #fff;
+    padding: 20px 24px;
+  }
+
+  .inst-header {
+    display: table;
+    width: 100%;
+    border-bottom: 3px double #1a1a1a;
+    padding-bottom: 10px;
+    margin-bottom: 14px;
+  }
+
+  .logo-cell {
+    display: table-cell;
+    width: 70px;
+    vertical-align: middle;
+    padding-right: 12px;
+  }
+
+  .logo-cell img {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+  }
+
+  .logo-placeholder {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    border: 2px solid #E8701A;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 7pt;
+    color: #E8701A;
+    font-weight: bold;
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  .header-text-cell {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+  }
+
+  .inst-name {
+    font-size: 19pt;
+    font-weight: bold;
+    letter-spacing: 1px;
+    color: #d67022;
+    margin-bottom: 3px;
+  }
+
+  .jai {
+    font-size: 8.5pt;
+    color: #ab3c0d;
+    margin-bottom: 2px;
+  }
+
+  .trust {
+    font-size: 9.5pt;
+    font-style: italic;
+    color: #984512;
+    margin-bottom: 2px;
+  }
+
+  .inst-sub {
+    font-size: 8.5pt;
+    color: #e06e3d;
+    margin-bottom: 2px;
+  }
+
+  .inst-addr {
+    font-size: 8pt;
+    color: #db8f2b;
+  }
+
+  .spacer-cell {
+    display: table-cell;
+    width: 70px;
+  }
+
+  .report-title {
+    background: #f3f3f3;
+    color: #111;
+    text-align: center;
+    padding: 8px 12px;
+    font-size: 11.5pt;
+    font-weight: bold;
+    letter-spacing: .4px;
+    margin-bottom: 12px;
+    border: 1px solid #d8d8d8;
+  }
+
+  .student-box {
+    border: 1px solid #d6d6d6;
+    border-radius: 4px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px 16px;
+    font-size: 9.8pt;
+  }
+
+  .student-box .field {
+    display: flex;
+    gap: 6px;
+    align-items: baseline;
+  }
+
+  .student-box .lbl {
+    color: #666;
+    min-width: 88px;
+    font-size: 9.2pt;
+  }
+
+  .student-box .val {
+    font-weight: bold;
+    font-size: 9.5pt;
+  }
+
+  .cgpa-strip {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    background: #f5f5f5;
+    border: 1px solid #d7d7d7;
+    border-radius: 4px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    font-size: 10pt;
+  }
+
+  .cgpa-strip .cv {
+    font-size: 18pt;
+    font-weight: bold;
+    color: #1a1a1a;
+    margin-right: 8px;
+  }
+
+  .sem-section {
+    margin-bottom: 18px;
+  }
+
+  .sem-heading {
+    background: #6b6b6b;
+    color: #fff;
+    padding: 6px 10px;
+    font-size: 10pt;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 0;
+  }
+
+  table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 9pt;
+}
+
+thead th {
+  background: #dfe8f3;
+  color: #1a1a1a;
+  padding: 6px 7px;
+  text-align: center;
+  font-size: 8.5pt;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  border: 1px solid #bcc8d6;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+tbody td {
+  padding: 4px 7px;
+  border: 1px solid #d6dbe3;
+  text-align: center;
+}
+
+tbody tr:nth-child(odd) td {
+  background: #ffffff;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+tbody tr:nth-child(even) td {
+  background: #f7f9fc;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+tbody tr.fail-row td {
+  background: #fff1f1;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+tbody tr.topper-row td {
+  background: #eefaf1;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.sem-heading {
+  background: #6d7f95;
+  color: #fff;
+  padding: 6px 10px;
+  font-size: 10pt;
+  font-weight: bold;
+}
+
+  .grade-good {
+    color: #2E8B57;
+    font-weight: bold;
+  }
+
+  .grade-mid {
+    color: #E8701A;
+    font-weight: bold;
+  }
+
+  .grade-fail {
+    color: #C0392B;
+    font-weight: bold;
+  }
+
+  .backlog-section {
+    margin-top: 14px;
+  }
+
+  .backlog-section h4 {
+    font-size: 10pt;
+    color: #C0392B;
+    border-bottom: 1px solid #C0392B;
+    padding-bottom: 3px;
+    margin-bottom: 8px;
+  }
+
+  .bottom-wrap {
+    margin-top: 18px;
+  }
+
+  .note-text {
+    font-size: 8pt;
+    color: #666;
+    font-style: italic;
+    margin-bottom: 22px;
+  }
+
+  .signature-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 28px;
+    margin-bottom: 18px;
+    min-height: 110px;
+    page-break-inside: avoid;
+  }
+
+  .sig-block {
+    width: 240px;
+    text-align: center;
+  }
+
+  .seal-box {
+    width: 90px;
+    height: 60px;
+    border: 1px dashed #c88c5a;
+    border-radius: 4px;
+    margin: 0 0 16px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 7.5pt;
+    color: #c88c5a;
+    font-style: italic;
+  }
+
+  .sig-line {
+    border-top: 1px solid #333;
+    width: 180px;
+    margin: 0 0 4px auto;
+    padding-top: 4px;
+    font-size: 9pt;
+    color: #111;
+    font-weight: bold;
+  }
+
+  .sig-sub {
+    font-size: 8pt;
+    color: #555;
+    margin-top: 2px;
+  }
+
+  .page-footer {
+    border-top: 1px solid #ddd;
+    margin-top: 6px;
+    padding-top: 6px;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    font-size: 8.5pt;
+    color: #666;
+  }
+
+  .print-note {
+    background: #FFF3CD;
+    border: 1px solid #F5A264;
+    border-radius: 4px;
+    padding: 8px 12px;
+    margin-bottom: 14px;
+    font-size: 9pt;
+    font-family: Arial, sans-serif;
+  }
+
+  @media print {
+    .print-note {
+      display: none;
+    }
+
+    body {
+      margin: 0;
+      padding: 16px;
+    }
+  }
+</style>
+</head>
+<body>
+
+{% if print_mode %}
+<div class="print-note">
+  <strong>Note:</strong> Install <code>xhtml2pdf</code> for automatic PDF. Use <strong>Ctrl+P</strong> → Save as PDF.
+</div>
+{% endif %}
+
+<div class="inst-header">
+  <div class="logo-cell">
+    {% if logo_url %}
+      <img src="{% static 'sjbit_logo.png' %}" alt="Institute Logo">
+    {% else %}
+      <div class="logo-placeholder">SJBIT</div>
+    {% endif %}
+  </div>
+
+  <div class="header-text-cell">
+    <div class="jai">|| Jai Sri Gurudev ||</div>
+    <div class="trust">Sri Adichunchanagiri Shikshana Trust (R.)</div>
+    <div class="inst-name">SJB INSTITUTE OF TECHNOLOGY</div>
+    <div class="inst-sub">Affiliated to Visveswaraya Technological University, Belagavi</div>
+    <div class="inst-addr">Approved by AICTE, New Delhi</div>
+  </div>
+
+  <div class="spacer-cell"></div>
+</div>
+
+<div class="report-title">INDIVIDUAL STUDENT ACADEMIC PERFORMANCE REPORT</div>
+
+<div class="student-box">
+  <div class="field"><span class="lbl">USN</span><span class="val">: {{ student.usn }}</span></div>
+  <div class="field"><span class="lbl">Name</span><span class="val">: {{ student.name }}</span></div>
+  <div class="field"><span class="lbl">Branch</span><span class="val">: {{ student.branch }}</span></div>
+  <div class="field"><span class="lbl">Batch</span><span class="val">: {{ student.batch }}</span></div>
+  <div class="field"><span class="lbl">Section</span><span class="val">: {{ student.section|default:"—" }}</span></div>
+  <div class="field"><span class="lbl">Gender</span><span class="val">: {{ student.get_gender_display|default:"—" }}</span></div>
+  <div class="field"><span class="lbl">Adm. Quota</span><span class="val">: {{ student.admission_quota|default:"—" }}</span></div>
+  <div class="field"><span class="lbl">Category</span><span class="val">: {{ student.actual_category|default:"—" }}</span></div>
+  <div class="field"><span class="lbl">CET Rank</span><span class="val">: {{ student.cet_rank|default:"—" }}</span></div>
+</div>
+
+<div class="cgpa-strip">
+  <span class="cv">{{ cgpa }}</span>
+  <div>
+    <div style="font-size:9pt; font-weight:bold; color:#555; text-transform:uppercase; letter-spacing:.05em;">
+      Cumulative GPA (CGPA)
+    </div>
+    <div style="font-size:8.5pt; color:#777; margin-top:2px;">
+      Calculated across all uploaded semesters
+    </div>
+  </div>
+  <div style="margin-left:auto; text-align:right; font-size:9pt; color:#555;">
+    {% if backlogs %}
+      <span style="color:#C0392B; font-weight:bold;">⚠ {{ backlogs|length }} Active Backlog(s)</span>
+    {% else %}
+      <span style="color:#2E8B57; font-weight:bold;">✓ No Active Backlogs</span>
+    {% endif %}
+  </div>
+</div>
+
+{% for sd in semester_data %}
+<div class="sem-section">
+  <div class="sem-heading">
+    <span>Semester {{ sd.sem_result.semester }}{% if sd.sem_result.academic_year %} — {{ sd.sem_result.academic_year }}{% endif %}</span>
+    <span>
+      SGPA: {{ sd.sem_result.sgpa }} &nbsp;|&nbsp;
+      Credits: {{ sd.sem_result.credits_earned }}/{{ sd.sem_result.total_credits }} &nbsp;|&nbsp;
+      {% if sd.sem_result.pass_fail == 'P' %}PASS{% else %}FAIL{% endif %}
+    </span>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:100px;">Sub. Code</th>
+        <th style="text-align:left;">Subject Name</th>
+        <th>Credits</th>
+        <th>CIE</th>
+        <th>SEE</th>
+        <th>Total</th>
+        <th>Grade</th>
+        <th>GP</th>
+        <th>Result</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in sd.results %}
+      <tr {% if r.pass_fail == 'F' %}class="fail-row"{% endif %}>
+        <td>{{ r.subject.code }}</td>
+        <td style="text-align:left;">{{ r.subject.name }}</td>
+        <td>{{ r.subject.credits }}</td>
+        <td>{{ r.cie_marks|default:"—" }}</td>
+        <td>{{ r.see_marks|default:"—" }}</td>
+        <td><strong>{{ r.total_marks|default:"—" }}</strong></td>
+        <td class="{% if r.grade == 'O' or r.grade == 'A+' or r.grade == 'A' %}grade-good{% elif r.grade == 'F' %}grade-fail{% else %}grade-mid{% endif %}">
+          {{ r.grade|default:"—" }}
+        </td>
+        <td>{{ r.grade_point|default:"—" }}</td>
+        <td style="font-weight:bold; color:{% if r.pass_fail == 'P' %}#2E8B57{% else %}#C0392B{% endif %}">
+          {{ r.get_pass_fail_display }}
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="9" style="text-align:center; color:#888; padding:8px;">No results</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% empty %}
+<p style="text-align:center; color:#888; padding:20px;">No semester results available.</p>
+{% endfor %}
+
+{% if backlogs %}
+<div class="backlog-section">
+  <h4>Active Backlog Subjects</h4>
+  <table>
+    <thead>
+      <tr>
+        <th>Subject Code</th>
+        <th style="text-align:left;">Subject Name</th>
+        <th>Semester</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for b in backlogs %}
+      <tr>
+        <td>{{ b.subject.code }}</td>
+        <td style="text-align:left;">{{ b.subject.name }}</td>
+        <td>Sem {{ b.semester }}</td>
+        <td class="grade-fail">Active</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<div class="bottom-wrap">
+  <p class="note-text">
+    * Pass % = (Pass / Total) &times; 100 &nbsp;|&nbsp;
+    * Avg SGPA from all uploaded semester records &nbsp;|&nbsp;
+    * Fail = Total &minus; Pass
+  </p>
+
+  <div class="signature-row">
+    <div class="sig-block">
+      <div class="seal-box">Office<br>Seal</div>
+      <div class="sig-line">Exam Section</div>
+      <div class="sig-sub">Result Analytics</div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>Result Analytics — Academic Performance System &nbsp;|&nbsp; Confidential — For Internal Use Only</span>
+    <span>Generated: {% now "d M Y, h:i A" %}</span>
+  </div>
+</div>
+
+</body>
+</html>

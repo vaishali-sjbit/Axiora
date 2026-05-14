@@ -1,0 +1,507 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Subject Result Report — {{ subject.code }}</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 11pt;
+    color: #111;
+    background: #fff;
+    padding: 20px 24px;
+  }
+
+  .inst-header {
+    display: table;
+    width: 100%;
+    border-bottom: 3px double #1a1a1a;
+    padding-bottom: 10px;
+    margin-bottom: 14px;
+  }
+
+  .logo-cell {
+    display: table-cell;
+    width: 70px;
+    vertical-align: middle;
+    padding-right: 12px;
+  }
+
+  .logo-cell img {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+  }
+
+  .logo-placeholder {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    border: 2px solid #E8701A;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 7pt;
+    color: #E8701A;
+    font-weight: bold;
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  .header-text-cell {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+  }
+
+  .jai {
+    font-size: 8.5pt;
+    color: #ab3c0d;
+    margin-bottom: 2px;
+  }
+
+  .trust {
+    font-size: 9.5pt;
+    font-style: italic;
+    color: #984512;
+    margin-bottom: 2px;
+  }
+
+  .inst-name {
+    font-size: 19pt;
+    font-weight: bold;
+    letter-spacing: 1px;
+    color: #d67022;
+    margin-bottom: 3px;
+  }
+
+  .inst-sub {
+    font-size: 8.5pt;
+    color: #e06e3d;
+    margin-bottom: 2px;
+  }
+
+  .inst-addr {
+    font-size: 8pt;
+    color: #db8f2b;
+  }
+
+  .spacer-cell {
+    display: table-cell;
+    width: 70px;
+  }
+
+  .report-title {
+    background: #f3f3f3;
+    color: #111;
+    text-align: center;
+    padding: 8px 12px;
+    font-size: 11.5pt;
+    font-weight: bold;
+    letter-spacing: .4px;
+    margin-bottom: 12px;
+    border: 1px solid #d8d8d8;
+  }
+
+  .subject-box {
+    border: 1px solid #d6d6d6;
+    border-radius: 4px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px 18px;
+    font-size: 9.8pt;
+  }
+
+  .subject-box .field {
+    display: flex;
+    gap: 6px;
+    align-items: baseline;
+  }
+
+  .subject-box .lbl {
+    color: #666;
+    min-width: 110px;
+    font-size: 9.2pt;
+  }
+
+  .subject-box .val {
+    font-weight: bold;
+    font-size: 9.5pt;
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .stat-box {
+    border: 1px solid #d7d7d7;
+    border-radius: 4px;
+    text-align: center;
+    padding: 8px 4px;
+    background: #fff;
+  }
+
+  .stat-box .sv {
+    font-size: 16pt;
+    font-weight: bold;
+    color: #1a1a1a;
+  }
+
+  .stat-box .sl {
+    font-size: 7.5pt;
+    color: #666;
+    margin-top: 2px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+
+  .stat-box.green .sv { color: #2E8B57; }
+  .stat-box.red .sv { color: #C0392B; }
+  .stat-box.orange .sv { color: #E8701A; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9.3pt;
+    margin-bottom: 14px;
+  }
+
+  thead th {
+    background: #dfe8f3;
+    color: #1a1a1a;
+    padding: 6px 8px;
+    text-align: center;
+    font-size: 8.5pt;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    border: 1px solid #bcc8d6;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  tbody td {
+    padding: 5px 8px;
+    border: 1px solid #d6dbe3;
+    text-align: center;
+  }
+
+  tbody tr:nth-child(odd) td {
+    background: #ffffff;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  tbody tr:nth-child(even) td {
+    background: #f7f9fc;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  tbody tr.fail-row td {
+    background: #fff1f1;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .grade-O, .grade-Ap {
+    color: #2E8B57;
+    font-weight: bold;
+  }
+
+  .grade-A {
+    color: #27AE60;
+    font-weight: bold;
+  }
+
+  .grade-Bp {
+    color: #E8701A;
+    font-weight: bold;
+  }
+
+  .grade-F {
+    color: #C0392B;
+    font-weight: bold;
+  }
+
+  .grade-dist {
+    margin-bottom: 14px;
+  }
+
+  .grade-dist strong {
+    font-size: 9pt;
+  }
+
+  .grade-dist table {
+    font-size: 9pt;
+    margin-top: 6px;
+  }
+
+  .grade-dist thead th {
+    background: #e6edf7;
+    color: #1a1a1a;
+  }
+
+  .signature-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 28px;
+    margin-bottom: 18px;
+    min-height: 110px;
+    page-break-inside: avoid;
+  }
+
+  .sig-block {
+    width: 240px;
+    text-align: center;
+  }
+
+  .seal-box {
+    width: 90px;
+    height: 60px;
+    border: 1px dashed #c88c5a;
+    border-radius: 4px;
+    margin: 0 0 16px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 7.5pt;
+    color: #c88c5a;
+    font-style: italic;
+  }
+
+  .sig-line {
+    border-top: 1px solid #333;
+    width: 180px;
+    margin: 0 0 4px auto;
+    padding-top: 4px;
+    font-size: 9pt;
+    color: #111;
+    font-weight: bold;
+  }
+
+  .sig-sub {
+    font-size: 8pt;
+    color: #555;
+    margin-top: 2px;
+  }
+
+  .page-footer {
+    border-top: 1px solid #ddd;
+    margin-top: 6px;
+    padding-top: 6px;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    font-size: 8.5pt;
+    color: #666;
+  }
+
+  .print-note {
+    background: #FFF3CD;
+    border: 1px solid #F5A264;
+    border-radius: 4px;
+    padding: 8px 12px;
+    margin-bottom: 14px;
+    font-size: 9pt;
+    font-family: Arial, sans-serif;
+  }
+
+  @media print {
+    .print-note {
+      display: none;
+    }
+
+    body {
+      margin: 0;
+      padding: 16px;
+    }
+  }
+</style>
+</head>
+<body>
+
+{% if print_mode %}
+<div class="print-note">
+  <strong>Note:</strong> Install <code>xhtml2pdf</code> for automatic PDF generation. Use <strong>Ctrl+P / Cmd+P</strong> → Save as PDF in your browser.
+</div>
+{% endif %}
+
+<div class="inst-header">
+  <div class="logo-cell">
+    {% if logo_url %}
+      <img src="{% static 'sjbit_logo.png' %}" alt="Institute Logo">
+    {% else %}
+      <div class="logo-placeholder">SJBIT</div>
+    {% endif %}
+  </div>
+  <div class="header-text-cell">
+    <div class="jai">|| Jai Sri Gurudev ||</div>
+    <div class="trust">Sri Adichunchanagiri Shikshana Trust (R.)</div>
+    <div class="inst-name">SJB INSTITUTE OF TECHNOLOGY</div>
+    <div class="inst-sub">Affiliated to Visveswaraya Technological University, Belagavi</div>
+    <div class="inst-addr">Approved by AICTE, New Delhi</div>
+  </div>
+  <div class="spacer-cell"></div>
+</div>
+
+<div class="report-title">SUBJECT-WISE RESULT ANALYSIS REPORT</div>
+
+<div class="subject-box">
+  <div class="field"><span class="lbl">Subject Code</span><span class="val">: {{ subject.code }}</span></div>
+  <div class="field"><span class="lbl">Subject Name</span><span class="val">: {{ subject.name }}</span></div>
+  <div class="field"><span class="lbl">Branch</span><span class="val">: {{ subject.branch|default:"—" }}</span></div>
+  <div class="field"><span class="lbl">Semester</span><span class="val">: {{ subject.semester|default:"—" }}</span></div>
+  <div class="field"><span class="lbl">Credits</span><span class="val">: {{ subject.credits }}</span></div>
+  <div class="field"><span class="lbl">Report Date</span><span class="val">: {% now "d M Y" %}</span></div>
+</div>
+
+<div class="stats-row">
+  <div class="stat-box">
+    <div class="sv">{{ total }}</div>
+    <div class="sl">Appeared</div>
+  </div>
+  <div class="stat-box green">
+    <div class="sv">{{ passes }}</div>
+    <div class="sl">Pass</div>
+  </div>
+  <div class="stat-box red">
+    <div class="sv">{{ fails }}</div>
+    <div class="sl">Fail</div>
+  </div>
+  <div class="stat-box orange">
+    <div class="sv">{{ pass_pct }}%</div>
+    <div class="sl">Pass %</div>
+  </div>
+  <div class="stat-box">
+    <div class="sv">{{ avg_total }}</div>
+    <div class="sl">Avg Marks</div>
+  </div>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width:28px;">#</th>
+      <th>USN</th>
+      <th>Student Name</th>
+      <th>Branch</th>
+      <th>CIE</th>
+      <th>SEE</th>
+      <th>Total</th>
+      <th>Grade</th>
+      <th>GP</th>
+      <th>Result</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in results %}
+    <tr {% if r.pass_fail == 'F' %}class="fail-row"{% endif %}>
+      <td>{{ forloop.counter }}</td>
+      <td style="text-align:left;">{{ r.student.usn }}</td>
+      <td style="text-align:left;">{{ r.student.name }}</td>
+      <td>{{ r.student.branch }}</td>
+      <td>{{ r.cie_marks|default:"—" }}</td>
+      <td>{{ r.see_marks|default:"—" }}</td>
+      <td><strong>{{ r.total_marks|default:"—" }}</strong></td>
+      <td class="grade-{% if r.grade == 'O' %}O{% elif r.grade == 'A+' %}Ap{% elif r.grade == 'A' %}A{% elif r.grade == 'B+' %}Bp{% elif r.grade == 'F' %}F{% endif %}">
+        {{ r.grade|default:"—" }}
+      </td>
+      <td>{{ r.grade_point|default:"—" }}</td>
+      <td style="font-weight:bold; color:{% if r.pass_fail == 'P' %}#2E8B57{% else %}#C0392B{% endif %}">
+        {{ r.get_pass_fail_display }}
+      </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="10" style="text-align:center; padding:12px; color:#888;">No records found</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="grade-dist">
+  <strong>Grade Scale Reference (VTU):</strong>
+  <table>
+    <thead>
+      <tr>
+        <th>Marks ≥</th>
+        <th>90</th>
+        <th>85</th>
+        <th>80</th>
+        <th>75</th>
+        <th>70</th>
+        <th>60</th>
+        <th>50</th>
+        <th>40</th>
+        <th>&lt;40</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="border:1px solid #d6dbe3; padding:4px; font-weight:bold;">Grade</td>
+        <td style="border:1px solid #d6dbe3; padding:4px; color:#2E8B57; font-weight:bold;">O</td>
+        <td style="border:1px solid #d6dbe3; padding:4px; color:#27AE60; font-weight:bold;">A+</td>
+        <td style="border:1px solid #d6dbe3; padding:4px; color:#27AE60; font-weight:bold;">A</td>
+        <td style="border:1px solid #d6dbe3; padding:4px; color:#E8701A; font-weight:bold;">B+</td>
+        <td style="border:1px solid #d6dbe3; padding:4px; color:#E8701A; font-weight:bold;">B</td>
+        <td style="border:1px solid #d6dbe3; padding:4px; color:#F39C12; font-weight:bold;">C</td>
+        <td style="border:1px solid #d6dbe3; padding:4px; color:#D4AC0D; font-weight:bold;">D</td>
+        <td style="border:1px solid #d6dbe3; padding:4px; color:#D4AC0D; font-weight:bold;">P</td>
+        <td style="border:1px solid #d6dbe3; padding:4px; color:#C0392B; font-weight:bold;">F</td>
+      </tr>
+      <tr>
+        <td style="border:1px solid #d6dbe3; padding:4px; font-weight:bold;">GP</td>
+        <td style="border:1px solid #d6dbe3; padding:4px; text-align:center;">10</td>
+        <td style="border:1px solid #d6dbe3; padding:4px; text-align:center;">9</td>
+        <td style="border:1px solid #d6dbe3; padding:4px; text-align:center;">8</td>
+        <td style="border:1px solid #d6dbe3; padding:4px; text-align:center;">7</td>
+        <td style="border:1px solid #d6dbe3; padding:4px; text-align:center;">6</td>
+        <td style="border:1px solid #d6dbe3; padding:4px; text-align:center;">5</td>
+        <td style="border:1px solid #d6dbe3; padding:4px; text-align:center;">4</td>
+        <td style="border:1px solid #d6dbe3; padding:4px; text-align:center;">4</td>
+        <td style="border:1px solid #d6dbe3; padding:4px; text-align:center;">0</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="signature-row">
+  <div class="sig-block">
+    <div class="seal-box">Office<br>Seal</div>
+    <div class="sig-line">Prepared by</div>
+    <div class="sig-sub">Result Analytics System</div>
+  </div>
+  <div class="sig-block">
+    <div class="seal-box">Seal</div>
+    <div class="sig-line">Class Teacher / Coordinator</div>
+  </div>
+  <div class="sig-block">
+    <div class="seal-box">Seal</div>
+    <div class="sig-line">Head of Department</div>
+  </div>
+  <div class="sig-block">
+    <div class="seal-box">Seal</div>
+    <div class="sig-line">Principal</div>
+  </div>
+</div>
+
+<div class="page-footer">
+  <span>Result Analytics — Academic Performance System &nbsp;|&nbsp; Confidential — For Internal Use Only</span>
+  <span>Generated: {% now "d M Y, h:i A" %}</span>
+</div>
+
+</body>
+</html>
